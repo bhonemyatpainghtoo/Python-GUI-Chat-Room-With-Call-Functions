@@ -4,7 +4,7 @@ import time
 
 # ─── Server Configuration ────────────────────────────────────────────────────
 HOST = '127.0.0.1'  # Local testing IP
-PORT = 5050         # Server port number
+PORT = 5555         # Server port number
 BUFFER_SIZE = 1024  # Max bytes per recv() call
 
 # ─── Reconnect Configuration ─────────────────────────────────────────────────
