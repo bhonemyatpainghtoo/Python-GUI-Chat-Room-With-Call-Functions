@@ -1,39 +1,44 @@
-from vidstream import AudioSender
-from vidstream import AudioReceiver
 import threading
+from vidstream import AudioSender, AudioReceiver
 
 sender = None
 receiver = None
 send_thread = None
 receive_thread = None
 
-def start_voice(ip, port):
+def start_voice(target_ip, my_receive_port, target_send_port):
     global sender, receiver, send_thread, receive_thread
     
-    # create instances of AudioSender and AudioReceiver
-    receiver = AudioReceiver(ip, port)
-    sender = AudioSender(ip, port)
-    
-    # create threads for sending and receiving audio
-    receive_thread = threading.Thread(target=receiver.start_server)
-    send_thread = threading.Thread(target=sender.start_stream)
+    if sender or receiver:
+        stop_voice()
 
-    # start threads for sending and receiving audio
-    receive_thread.start()
-    send_thread.start()
+    try:
+        receiver = AudioReceiver('0.0.0.0', my_receive_port)
+        sender = AudioSender(target_ip, target_send_port)
+        
+        receive_thread = threading.Thread(target=receiver.start_server, daemon=True)
+        send_thread = threading.Thread(target=sender.start_stream, daemon=True)
 
-    print("Voice communication started.")
+        receive_thread.start()
+        send_thread.start()
 
+        return True
+    except Exception:
+        return False
 
 def stop_voice():
     global sender, receiver
 
     if sender:
-        sender.stop_stream()
+        try:
+            sender.stop_stream()
+        except Exception:
+            pass
         sender = None
 
     if receiver:
-        receiver.stop_server()
+        try:
+            receiver.stop_server()
+        except Exception:
+            pass
         receiver = None
-
-    print("Voice communication stopped.")
