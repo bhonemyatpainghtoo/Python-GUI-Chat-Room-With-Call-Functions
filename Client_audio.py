@@ -28,7 +28,7 @@ def start_voice(target_ip, my_receive_port, target_send_port):
         return False
 
 def stop_voice():
-    global sender, receiver
+    global sender, receiver, send_thread, receive_thread
 
     if sender:
         try:
@@ -44,4 +44,5 @@ def stop_voice():
             pass
         receiver = None
         
-    send_thread = receive_thread = None
+    send_thread = None
+    receive_thread = None
