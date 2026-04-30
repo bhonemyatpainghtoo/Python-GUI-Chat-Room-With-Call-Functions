@@ -244,29 +244,3 @@ class TextClient:
         print("[Reconnect Failed] Max retries exceeded")
         if self.on_error:
             self.on_error("Reconnect failed. Please check server and restart.")
-
-
-# ─── Usage Example ───────────────────────────────────────────────────────────
-# Use like this in main.py:
-#
-# from Client_text import TextClient
-#
-# text_client = TextClient()
-#
-# # Connect callbacks
-# text_client.on_message_received = gui.display_message    # Display message in GUI
-# text_client.on_signal_received  = main.handle_signal     # Handle signal in main.py
-# text_client.on_error            = gui.show_error         # Show error in GUI
-#
-# # Connect to server and start receiving
-# text_client.connect(username="Alice")
-# text_client.start_receiving()
-#
-# # Send a chat message
-# text_client.send_message("Hello!")
-#
-# # Send a call signal
-# text_client.send_signal("INCOMING_CALL")
-#
-# # Disconnect
-# text_client.disconnect()
