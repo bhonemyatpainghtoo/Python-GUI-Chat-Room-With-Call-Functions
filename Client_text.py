@@ -161,7 +161,7 @@ class TextClient:
             if message.startswith(signal):
                 print(f"[Signal Detected] {signal}")
                 if self.on_signal_received:
-                    self.on_signal_received(signal)
+                    self.on_signal_received(message)
                 return
 
         # Not a signal - treat as regular chat message
