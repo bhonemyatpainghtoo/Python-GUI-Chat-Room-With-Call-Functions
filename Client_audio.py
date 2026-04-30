@@ -46,3 +46,4 @@ def stop_voice():
         
     send_thread = None
     receive_thread = None
+
