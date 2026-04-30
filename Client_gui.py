@@ -49,7 +49,7 @@ class ChatGUI:
             return
 
         if self.on_connect:
-            success = self.on_connect(ip, port, username)
+            success = self.on_connect(ip, int(port), username)
             if success:
                 self.conn_frame.destroy()
                 self.setup_chat_screen()
@@ -121,7 +121,7 @@ class ChatGUI:
         """use this when the server sends an INCOMING_CALL signal."""
         return messagebox.askyesno("Incoming Call", f"{caller_name} is calling you. Accept?")
 
-    def show_error(self, title, message):
+    def show_error(self, message, title="Error"):
         """General purpose error popup."""
         messagebox.showerror(title, message)
 
