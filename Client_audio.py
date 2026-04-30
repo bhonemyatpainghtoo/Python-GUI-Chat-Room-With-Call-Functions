@@ -23,7 +23,8 @@ def start_voice(target_ip, my_receive_port, target_send_port):
         send_thread.start()
 
         return True
-    except Exception:
+    except Exception as e:
+        print(f"[Audio Error] {e}");
         return False
 
 def stop_voice():
@@ -42,3 +43,5 @@ def stop_voice():
         except Exception:
             pass
         receiver = None
+        
+    send_thread = receive_thread = None
