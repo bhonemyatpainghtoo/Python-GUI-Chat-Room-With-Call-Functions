@@ -16,6 +16,16 @@ class ChatGUI:
 
         self.setup_connection_screen()
 
+    def get_selected_user(self):
+        """Returns the username currently clicked in the Listbox."""
+        try:
+            selection = self.user_listbox.curselection()
+            if selection:
+                return self.user_listbox.get(selection[0])
+            return None
+        except Exception:
+            return None
+
     def setup_connection_screen(self):
         self.conn_frame = tk.Frame(self.root, pady=100)
         self.conn_frame.pack()
@@ -58,15 +68,29 @@ class ChatGUI:
         self.chat_frame = tk.Frame(self.root, padx=10, pady=10)
         self.chat_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Left Side: Chat Area
+        # 1. Right Side: Active Users & Call Controls
+        right_frame = tk.Frame(self.chat_frame, padx=10)
+        right_frame.pack(side=tk.RIGHT, fill=tk.Y)
+
+        tk.Label(right_frame, text="Active Users").pack(side=tk.TOP)
+
+        # PACK BUTTONS AT THE BOTTOM FIRST (prevents them from getting pushed off-screen)
+        end_call_btn = tk.Button(right_frame, text="🛑 End Call", command=self.handle_end_call, bg="salmon", width=15)
+        end_call_btn.pack(side=tk.BOTTOM, pady=(0, 5))
+
+        call_btn = tk.Button(right_frame, text="📞 Start Call", command=self.handle_call, bg="lightgreen", width=15)
+        call_btn.pack(side=tk.BOTTOM, pady=(0, 5))
+
+        # Pack Listbox in the middle, telling it to expand into the remaining space
+        self.user_listbox = tk.Listbox(right_frame, width=20)
+        self.user_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True, pady=(0, 10))
+
+        # 2. Left Side: Chat Display & Input
         left_frame = tk.Frame(self.chat_frame)
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        self.chat_display = scrolledtext.ScrolledText(left_frame, state='disabled', wrap=tk.WORD, width=40, height=20)
-        self.chat_display.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
-
         input_frame = tk.Frame(left_frame)
-        input_frame.pack(fill=tk.X)
+        input_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.msg_entry = tk.Entry(input_frame)
         self.msg_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
@@ -75,20 +99,8 @@ class ChatGUI:
         send_btn = tk.Button(input_frame, text="Send", command=self.handle_send, bg="lightgreen")
         send_btn.pack(side=tk.RIGHT)
 
-        # Right Side: Users & Call Controls
-        right_frame = tk.Frame(self.chat_frame, padx=10)
-        right_frame.pack(side=tk.RIGHT, fill=tk.Y)
-
-        tk.Label(right_frame, text="Active Users").pack()
-        
-        self.user_listbox = tk.Listbox(right_frame, height=15, width=20)
-        self.user_listbox.pack(pady=(0, 10))
-
-        call_btn = tk.Button(right_frame, text="📞 Start Call", command=self.handle_call, bg="lightgreen", width=15)
-        call_btn.pack(pady=5)
-
-        end_call_btn = tk.Button(right_frame, text="🛑 End Call", command=self.handle_end_call, bg="salmon", width=15)
-        end_call_btn.pack(pady=5)
+        self.chat_display = scrolledtext.ScrolledText(left_frame, state='disabled', wrap=tk.WORD, width=40, height=20)
+        self.chat_display.pack(side=tk.TOP, fill=tk.BOTH, expand=True, pady=(0, 10))
 
     def handle_send(self):
         msg = self.msg_entry.get().strip()
@@ -97,8 +109,9 @@ class ChatGUI:
             self.msg_entry.delete(0, tk.END)
 
     def handle_call(self):
+        target = self.get_selected_user()
         if self.on_start_call:
-            self.on_start_call()
+            self.on_start_call(target) # Pass the chosen name to Main.py
 
     def handle_end_call(self):
         if self.on_end_call:
@@ -113,6 +126,10 @@ class ChatGUI:
 
     def update_users(self, user_list):
         """use this to update the listbox with active usernames."""
+        # Prevent crash if the server sends the user list before the UI is fully drawn
+        if not hasattr(self, 'user_listbox'):
+            return 
+            
         self.user_listbox.delete(0, tk.END)
         for user in user_list:
             self.user_listbox.insert(tk.END, user)
