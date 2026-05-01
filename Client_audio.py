@@ -13,10 +13,10 @@ def start_voice(target_ip, my_receive_port, target_send_port):
         stop_voice()
 
     try:
-        receiver = AudioReceiver('0.0.0.0', my_receive_port)
+        receiver = AudioReceiver('0.0.0.0', my_receive_port) # listen to all voice traffic by 0.0.0.0
         sender = AudioSender(target_ip, target_send_port)
         
-        receive_thread = threading.Thread(target=receiver.start_server, daemon=True)
+        receive_thread = threading.Thread(target=receiver.start_server, daemon=True) # daemon threading to make sure the GUI doesnt crash
         send_thread = threading.Thread(target=sender.start_stream, daemon=True)
 
         receive_thread.start()
