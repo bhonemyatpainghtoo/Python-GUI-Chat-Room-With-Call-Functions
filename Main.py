@@ -16,9 +16,9 @@ def main():
     app = ChatGUI(root)       
     client = TextClient()     
 
-    # Track current call state
+    # Track the call state
     current_call_partner = None
-    current_call_ip = None      # <--- NEW: Tracks the dynamic target IP
+    current_call_ip = None
     current_rx_port = 0
     current_tx_port = 0
 
@@ -41,7 +41,8 @@ def main():
             return
 
         current_call_partner = target
-        
+
+        # random audio ports to avoid windows port letting problem
         current_rx_port = random.randint(20000, 50000)
         current_tx_port = random.randint(20000, 50000)
         while current_tx_port == current_rx_port:
@@ -99,7 +100,7 @@ def main():
         if base_signal == SIGNAL_INCOMING_CALL:
             caller_rx = int(parts[2])
             caller_tx = int(parts[3])
-            caller_ip = parts[4]  # <--- NEW: Extract the IP injected by the server
+            caller_ip = parts[4]
             
             accepted = app.show_incoming_call_popup(other_user)
             if accepted:
@@ -116,7 +117,7 @@ def main():
                 app.display_message(f"System: Call from {other_user} declined.")
 
         elif base_signal == SIGNAL_CALL_ACCEPTED:
-            receiver_ip = parts[2] # <--- NEW: Extract the receiver's IP
+            receiver_ip = parts[2]
             current_call_ip = receiver_ip
             
             app.display_message(f"System: {other_user} accepted! Connecting audio...")
