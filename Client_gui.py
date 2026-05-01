@@ -17,7 +17,7 @@ class ChatGUI:
         self.setup_connection_screen()
 
     def get_selected_user(self):
-        """Returns the username currently clicked in the Listbox."""
+        # username currently chosen in the listbox
         try:
             selection = self.user_listbox.curselection()
             if selection:
@@ -68,24 +68,24 @@ class ChatGUI:
         self.chat_frame = tk.Frame(self.root, padx=10, pady=10)
         self.chat_frame.pack(fill=tk.BOTH, expand=True)
 
-        # 1. Right Side: Active Users & Call Controls
+        # Right: active users list and call buttons
         right_frame = tk.Frame(self.chat_frame, padx=10)
         right_frame.pack(side=tk.RIGHT, fill=tk.Y)
 
         tk.Label(right_frame, text="Active Users").pack(side=tk.TOP)
 
-        # PACK BUTTONS AT THE BOTTOM FIRST (prevents them from getting pushed off-screen)
+        # Buttons at the bottom to prevent them from not appearing
         end_call_btn = tk.Button(right_frame, text="🛑 End Call", command=self.handle_end_call, bg="salmon", width=15)
         end_call_btn.pack(side=tk.BOTTOM, pady=(0, 5))
 
         call_btn = tk.Button(right_frame, text="📞 Start Call", command=self.handle_call, bg="lightgreen", width=15)
         call_btn.pack(side=tk.BOTTOM, pady=(0, 5))
 
-        # Pack Listbox in the middle, telling it to expand into the remaining space
+        #Listbox in the middle.
         self.user_listbox = tk.Listbox(right_frame, width=20)
         self.user_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True, pady=(0, 10))
 
-        # 2. Left Side: Chat Display & Input
+        #Left Side: chat display and input field
         left_frame = tk.Frame(self.chat_frame)
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
@@ -111,22 +111,22 @@ class ChatGUI:
     def handle_call(self):
         target = self.get_selected_user()
         if self.on_start_call:
-            self.on_start_call(target) # Pass the chosen name to Main.py
+            self.on_start_call(target) 
 
     def handle_end_call(self):
         if self.on_end_call:
             self.on_end_call()
 
     def display_message(self, message):
-        """use this to print incoming socket messages."""
+        # print the messages sent
         self.chat_display.config(state='normal')
         self.chat_display.insert(tk.END, message + "\n")
         self.chat_display.see(tk.END) 
         self.chat_display.config(state='disabled')
 
     def update_users(self, user_list):
-        """use this to update the listbox with active usernames."""
-        # Prevent crash if the server sends the user list before the UI is fully drawn
+        # update listbox with the users who join
+        # crash and error fix
         if not hasattr(self, 'user_listbox'):
             return 
             
@@ -135,41 +135,39 @@ class ChatGUI:
             self.user_listbox.insert(tk.END, user)
 
     def show_incoming_call_popup(self, caller_name):
-        """use this when the server sends an INCOMING_CALL signal."""
+        # function for INCOMING_CALL signal
         return messagebox.askyesno("Incoming Call", f"{caller_name} is calling you. Accept?")
 
     def show_error(self, message, title="Error"):
-        """General purpose error popup."""
+        # error box incase errors
         messagebox.showerror(title, message)
 
 
-# Running file + dummy functions 
+# testing 
 if __name__ == "__main__":
     root = tk.Tk()
     app = ChatGUI(root)
     
-    # Dummy functions simulating network/audio actions
+    # test connect
     def example_connect(ip, port, user):
         print(f"NETWORK: Connecting to {ip}:{port} as {user}...")
-        return True # Tells GUI the connection was successful
+        return True 
 
     def example_send(msg):
         print(f"NETWORK: Sending -> {msg}")
-        # Display the message locally so the user sees what they typed
         app.display_message(f"You: {msg}")
         
-        # Simulate updating the user list after connecting
+        # test user list
         app.update_users(["John", "Alice", "Bob"])
 
     def example_start_call():
         print("AUDIO: Starting voice stream...")
-        # Simulating receiving a call from someone else
         app.show_incoming_call_popup("Teammate")
 
     def example_end_call():
         print("AUDIO: Ending voice stream...")
 
-    #Attaching the functions to the GUI hooks
+
     app.on_connect = example_connect
     app.on_send_message = example_send
     app.on_start_call = example_start_call
