@@ -3,7 +3,7 @@ import threading
 import time
 
 def get_local_ip():
-    """Automatically finds the computer's Wi-Fi / LAN IP address."""
+    # find the ip address of the computer for the server connection
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
@@ -12,8 +12,7 @@ def get_local_ip():
         return ip
     except Exception:
         return '127.0.0.1'
-
-# ─── Server Configuration ────────────────────────────────────────────────────
+# server config
 HOST = get_local_ip()  
 PORT = 5555         
 BUFFER_SIZE = 1024  
@@ -66,7 +65,7 @@ def handle_client(client_socket, address):
             
             message = data.decode('utf-8').strip()
             
-            # ─── PRIVATE ROUTING PROTOCOL (With IP Injection) ─────────────────
+            # routing protocol
             if message.startswith("@"):
                 try:
                     target_tag, private_msg = message.split(" ", 1)
@@ -79,7 +78,7 @@ def handle_client(client_socket, address):
                             break
                             
                     if target_socket:
-                        # --- NEW: Stamp the sender's IP onto the signal ---
+                        #put senders ip in the signal
                         sender_ip = address[0] 
                         private_msg_with_ip = f"{private_msg}:{sender_ip}"
                         
@@ -89,7 +88,7 @@ def handle_client(client_socket, address):
                 except ValueError:
                     pass 
                     
-            # ─── PUBLIC BROADCAST ──────────────────────────────────────────────
+            # Public broadcast
             else:
                 print(f"[{username}] {message}")
                 broadcast(message, client_socket)
@@ -98,6 +97,7 @@ def handle_client(client_socket, address):
         print(f"[Error] Connection lost with {address}: {e}")
     finally:
         remove_client(client_socket)
+
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
